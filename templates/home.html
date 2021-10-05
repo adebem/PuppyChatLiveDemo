@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+{% load static %}
+
+<html lang="en">
+
+    <head>
+        <title>Anthony de Bem</title>
+        <link rel = "stylesheet" href = "../static/css/style.css" type = "text/css">
+
+
+        <link rel="preconnect" href="https://fonts.gstatic.com">
+        <link href="https://fonts.googleapis.com/css2?family=Poppins&family=Raleway:ital@1&display=swap" rel="stylesheet">
+    </head>
+
+    <body>
+        <div class = "bar">
+            <a href = "http://www.anthonydevelops.com/index.html">
+                <div class = "tab">
+                    <img src="static/icons/profileA.png">
+
+                    <div class = "title">
+                        <h1> Anthony de Bem</h1>
+                        <h2> Software Developer</h2>
+                    </div>
+                </div>
+            </a>
+
+            <a href = "http://www.anthonydevelops.com/projects.html">
+                <div class = "tab">
+                    <img src="static/icons/projects.png">
+                    <h2>Projects</h2>
+                </div>
+            </a>
+
+            <a href = "http://www.anthonydevelops.com/resume.html">
+                <div class = "tab">
+                    <img src="static/icons/resume.png">
+                    <h2>Resume</h2>
+                </div>
+            </a>
+
+            <a href = "http://www.anthonydevelops.com/contact.html">
+                <div class = "tab">
+                    <img src="static/icons/contact.png">
+                    <h2>Contact</h2>
+                </div>
+            </a>
+
+            <a href = "http://www.anthonydevelops.com/about.html">
+                <div class = "tab">
+                    <img src="static/icons/about.png">
+                    <h2>About</h2>
+                </div>
+            </a>
+        </div>
+
+        <div class = "chatlog">
+            <div class = "demo">
+                <img src="static/icons/PuppyChat.png">
+            </div>
+
+            <div class = "userentry">
+                <img src="static/icons/dogIcon.png">
+                <h5>{{welcome}}</h5>
+            </div>
+
+            {% for entry in entries %}
+
+
+            <div class = "entry">
+                <h6>{{ entry}}</h6>
+                <img src="static/icons/userIcon.png">
+
+            </div>
+
+            <div class = "userentry" >
+                <img src="static/icons/dogIcon.png">
+                <h5>{{ entry.answer }}</h5>
+            </div>
+
+            {% endfor %}
+
+            {% if not goodbye %}
+            <form method = "post">
+                {% csrf_token %}
+                {{ form.input }}
+            </form>
+            {% endif %}
+        </div>
+    </body>
+</html>
