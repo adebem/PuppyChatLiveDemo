@@ -1,0 +1,121 @@
+a, body{
+	color: white;
+	text-decoration: none;
+	font-style: normal;
+}
+
+body{
+	font-family: Arial, sans-serif;
+	background-color: #333333;
+	margin: 0%;
+	color: white;
+}
+
+h2, h3, h4, li{
+	color: #B8B8B8;
+}
+
+h2{
+     font-size: 1.2em;
+}
+
+.bar{
+	padding-top: 0.5%;
+	padding-bottom: 0.5%;
+	background-color: #212121;
+	display: flex;
+	text-align: center;
+	min-width: 800px;
+}
+
+.bar img{
+	width: 100px;
+	float: left;
+}
+
+.bar a, h1, h2{
+	margin: auto;
+	color: white;
+}
+
+.tab{
+	display: table-cell;
+}
+
+.title{
+	width: 400px;
+	padding-top: 15px;
+}
+
+
+li{
+	font-size: 1.25em;
+}
+
+.page{
+	margin-bottom: 5%;
+	overflow-y: auto;
+}
+
+.demo img{
+    display: flex;
+	margin: auto;
+	margin-top: 1%;
+	margin-bottom: 1%;
+	width: 75%;
+
+}
+
+.chatlog {
+	background-color: #212121;
+	width: 50%;
+	margin: auto;
+	margin-top: 2%;
+	padding: 0.15%;
+
+}
+
+.chatlog h5, h6{
+    margin-top: 0;
+    margin-bottom: 0;
+    font-size: 13px;
+    border-radius: 7px;
+    padding: 0.5%;
+}
+
+.chatlog h5, h6{
+    color: black;
+    word-wrap: break-word;
+}
+
+.chatlog h6{
+    background-color: #FFD396;
+    max-width: 75%;
+    margin-left: auto;
+
+}
+
+.chatlog h5{
+    background-color: white;
+}
+
+.entry img, .userentry img{
+    height: 26px;
+    margin-left: 0.5%;
+    margin-right: 0.5%;
+}
+
+.userentry, .entry, input{
+    margin-top: 0.75%;
+    display: flex;
+}
+
+.userentry{
+    max-width: 75%;
+}
+
+input{
+    width: 100%;
+    padding: 0;
+    box-sizing: border-box;
+}
