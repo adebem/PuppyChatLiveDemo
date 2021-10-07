@@ -26,7 +26,7 @@ class Conversation:
         self.sentence = None
 
     # true if the user input is a 'bye', 'goodbye', or 'farewell', false otherwise
-    def notGoodbye(self, userInput):
+    def Goodbye(self, userInput):
         if len(userInput) > 0:
             if not userInput[-1].isalpha():
                 userInput = userInput[:-1]
@@ -38,7 +38,7 @@ class Conversation:
                 else:
                     return f'Goodbye!'
             else:
-                return True
+                return False
 
     # if there is a sentence tree in the parse tree, return the biggest sentence tree
     def getSentenceTree(self):
@@ -264,7 +264,6 @@ class Conversation:
         return output
 
     def pickResponse(self, question_number):
-        i=3
         if self.topics['subject']:
             # if there are two subject dogs and the subject is group, then we compare
             if self.topics['dog2'] and (type(self.topics['subject']) == str) and (self.topics['subject'] == 'group'):
@@ -313,7 +312,7 @@ class Conversation:
                         dog_name2 = self.topics['dog2']
                         proper_name2 = dog_name2.replace('_', ' ')
                         output = compare(dog_name, proper_name, dog_name2, proper_name2, self.topics['subject'],
-                                                 self.topics['comparison_keyword'])
+                                         self.topics['comparison_keyword'])
 
                 elif not self.topics['compare']:  # no comparison
                     output = self.singularResponse(dog_name, proper_name)
@@ -322,7 +321,8 @@ class Conversation:
                     and_or_also = ['And', 'Also'][randint(0, 1)]
 
                     if not (output.startswith('Yes, ') or output.startswith('No, ')):
-                        proper_names = [(output.startswith(e['name'].replace('_', ' '))) for e in list(Dog.objects.values('name'))]
+                        proper_names = [(output.startswith(e['name'].replace('_', ' '))) for e in
+                                        list(Dog.objects.values('name'))]
                     else:
                         proper_names = [False]
 
@@ -371,7 +371,10 @@ class Conversation:
     # afterwords, resets the self.topics
     def respond(self, user_input):
 
-        i=2
+        goodbye = self.Goodbye(user_input)
+
+        if goodbye:
+            return goodbye
 
         self.resetTopics()
 
@@ -390,15 +393,20 @@ class Conversation:
 
             if self.response == '':
                 return 'Sorry, I don\'t understand. Can you ask again?\n\n'
-            else:
-                if self.first_question:
-                    # always disclaim in the first response that the American Kennel Club is the source of the information:
-                    if 'American Kennel Club' not in self.response:
-                        proper_names = [(self.response.startswith(e['name'].replace('_', ' '))) for e in
-                                        list(Dog.objects.values('name'))]
 
+            elif (not self.response.startswith('Hi')) and self.first_question:
+
+                # always disclaim in the first response that the American Kennel Club is the source of the information:
+                if 'American Kennel Club' not in self.response:
+                    proper_names = [(self.response.startswith(e['name'].replace('_', ' '))) for e in
+                                    list(Dog.objects.values('name'))]
+
+                    if True in proper_names:
+                        self.response = self.disclaimer + self.response
+                    else:
                         self.response = self.disclaimer + self.response[0].lower() + self.response[1:]
-                    self.first_question = False
+
+                self.first_question = False
 
         return ConversationalListing(self.response)
 
@@ -442,9 +450,6 @@ class Demo:
         new_entry = ChatEntry(question, output)
 
         self.entries.append(new_entry)
-
-    def resetConvo(self):
-        self.conversation.reset()
 
 
 # HELPER FUNCTIONS
@@ -925,7 +930,7 @@ def getDogList(attribute, subject_dog, keyword):
     if reference:  # if we have a value to reference
         for dog in Dog.objects.all():
             # find a comparator value for every dog besides the subject dog
-            if dog.getName() != subject_dog.getName():
+            if dog.getName() != subject_dog:
                 # the comparator also depends on the keyword
                 satisfies = False
 
@@ -946,7 +951,7 @@ def getDogList(attribute, subject_dog, keyword):
                     satisfies = (comparator == reference)
 
                 if satisfies:
-                    dog_list.append(dog.replace('_', ' '))
+                    dog_list.append(dog.getName().replace('_', ' '))
     return dog_list
 
 
@@ -1014,17 +1019,21 @@ def findDogs(subject, subject_dog, keyword):
             measurements = {'height': 'in', 'weight': 'lbs', 'lifespan': 'yrs'}
 
             for dog in dog_list:
-                response += '    {}'.format(makePlural(dog))
+                response += '    {},'.format(makePlural(dog))
 
                 if subject in {'height', 'weight', 'lifespan'}:
+
+                    response = response[:-1]
+
                     if keyword == 'higher':
+
                         dog_value = getMinOrMax(dog.replace(' ', '_'), subject, max)
                     else:
                         dog_value = getMinOrMax(dog.replace(' ', '_'), subject, min)
 
                     dog_measurement = measurements[subject]
 
-                    response += ' ({} {})'.format(dog_value, dog_measurement)
+                    response += ' ({} {}), '.format(dog_value, dog_measurement)
 
                 response += '\n'
 
@@ -1044,7 +1053,13 @@ def findDogs(subject, subject_dog, keyword):
             response += 'I do not know of any dogs that {} than {} ({} {})\n' \
                 .format(description, proper_name, value, measurement)
 
-    return response
+    # remove commas from the end of the response if needed
+    if response[-4:] == '), \n':
+        return response[:-3] + ' \n'
+    elif response[-2:] == ',\n':
+        return response[:-1]
+    else:
+        return response
 
 
 #  makes a multi-sentence response more conversational by adding in 'and' and 'also'
