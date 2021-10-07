@@ -29,7 +29,7 @@ Running Locally:
 
 ![](screenshot1.png)
 
-<p><br>PuppyChat can also compare difference dog breeds on the following attributes:</p>
+<p>PuppyChat can also compare difference dog breeds on the following attributes:</p>
 
 * Height
 * Weight
@@ -38,11 +38,11 @@ Running Locally:
 
 ![](screenshot2.png)
 
-<p><br>PuppyChat can also make one-to-all comparisons between breeds on the same four attributes listed above:</p>
+<p>PuppyChat can also make one-to-all comparisons between breeds on the same four attributes listed above:</p>
 
 ![](screenshot3.png)
 
-<p><br>As a bonus, it also can give a list of the members within a certain group:</P>
+<p>As a bonus, it also can give a list of the members within a certain group:</P>
 
 ![](screenshot4.png)
 
