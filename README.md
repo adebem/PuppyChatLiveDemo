@@ -6,7 +6,6 @@ Welcome to PuppyChat! This is a project meant to showcase my skills in the pytho
 **NOTE:** All of the dog breed information is sourced from the American Kennel Club's Website. None of the information supplied is mine.
 
 ## Setup
-___
 Online:
 * Visit https://puppychatlivedemo.herokuapp.com/
 
@@ -17,7 +16,6 @@ Running Locally:
 4. Run the website on your local server
 
 ## PuppyChat in Action
-___
 
 <p>PuppyChat can answer trivia questions about these attributes for all 60 of PuppyChat's supported breeds:</p>
 
@@ -49,9 +47,7 @@ ___
 ![](screenshot4.png)
 
 ## Contributing
-___
 <p>Because this is only a personal side project, PuppyChat is not open to contributors.</p>
 
 ## Support
----
 Any questions? Email me at anthonyleedebem@gmail.com
