@@ -6,7 +6,7 @@ Welcome to PuppyChat! This is a project meant to showcase my skills in the pytho
 **NOTE:** All of the dog breed information is sourced from the American Kennel Club's Website. None of the information supplied is mine.
 
 ## Setup
-Online:
+Run the live demo online:
 * Visit https://puppychatlivedemo.herokuapp.com/
 
 Running Locally:
