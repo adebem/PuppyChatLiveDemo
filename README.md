@@ -9,7 +9,7 @@ Welcome to PuppyChat! This is a project meant to showcase my skills in the pytho
 Run the live demo online:
 * Visit https://puppychatlivedemo.herokuapp.com/
 
-Running Locally:
+Running PuppyChat locally:
 1. Install Python (version 3.8 reccomended) and Django
 2. Clone the repository
 3. Set up your virtual environment and install your requirements.txt
