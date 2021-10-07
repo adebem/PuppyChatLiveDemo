@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from LiveDemo.PuppyChat.demo import Demo
+from .demo import Demo
 from .forms import QuestionForm
 from pathlib import Path
 
