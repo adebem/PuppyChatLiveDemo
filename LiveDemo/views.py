@@ -7,9 +7,6 @@ from pathlib import Path
 demo = Demo()
 
 def Home(request):
-    return render(request, "home.html")
-
-def PuppyChat(request):
     global demo
 
     form = QuestionForm
@@ -45,27 +42,4 @@ def PuppyChat(request):
 
     }
 
-    return render(request, "PuppyChatDemo.html", context)
-
-def About(request):
-    return render(request, "about.html")
-
-def Contact(request):
-    return render(request, "contact.html")
-
-def Index(request):
-    return redirect('/home')
-
-def Projects(request):
-    global demo
-
-    if request.method == "POST":
-        demo.conversation.reset()
-        demo.entries = []
-
-        return redirect("/PuppyChat")
-    else:
-        return render(request, "projects.html")
-
-def Resume(request):
-    return render(request, "resume.html")
+    return render(request, "home.html", context)
