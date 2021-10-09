@@ -1,6 +1,6 @@
-from django.shortcuts import render, redirect
-from .demo import Demo
+from django.shortcuts import render
 from .forms import QuestionForm
+from .demo import Demo
 from pathlib import Path
 
 # Create your views here.
@@ -20,26 +20,25 @@ def Home(request):
     if 'input' in dict(request.POST).keys():
         question = dict(request.POST)['input'][0]
 
-        if (len(list(demo.entries)) == 0) or (str(question) != str(list(demo.entries)[-1])):
+        if (len(list(demo.conversation.entries)) == 0) or (str(question) != str(list(demo.conversation.entries)[-1])):
             demo.Ask(question)
 
-        if (len(list(demo.entries)) > 1) and (demo.entries[-2].answer().startswith('Goodbye')):
-            demo.entries = [demo.entries[-1]]
+        if (len(list(demo.conversation.entries)) > 1) and (demo.conversation.entries[-2].answer().startswith('Goodbye')):
+            demo.conversation.entries = [demo.conversation.entries[-1]]
     else:
-        demo.entries = []
+        demo.conversation.entries = []
 
     goodbye = demo.goodbye
 
     context = {
         "welcome": welcome,
         "form": form,
-        "entries": demo.entries,
+        "entries": demo.conversation.entries,
         "demo": demo,
         "conversation": demo.conversation,
         'goodbye': goodbye,
         'rp': dict(request.POST),
         'based': Path(__file__).resolve().parent.parent,
-
     }
 
     return render(request, "home.html", context)
