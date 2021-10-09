@@ -428,26 +428,6 @@ class ChatEntry:
     def answer(self):
         return self.o
 
-
-class Demo:
-    conversation = Conversation()
-    goodbye = False
-
-    # get goodbye before calling Ask() so that the goodbye entry can be printed on the screen
-
-    def Ask(self, question):
-        if question.lower().replace(".|?|!", "") in {"goodbye", "bye", "farewell"}:
-            output = "Goodbye!"
-            self.goodbye = True
-        else:
-
-            output = self.conversation.respond(question)
-
-        new_entry = ChatEntry(question, output)
-
-        self.conversation.entries.append(new_entry)
-
-
 # HELPER FUNCTIONS
 
 def makePlural(name):
