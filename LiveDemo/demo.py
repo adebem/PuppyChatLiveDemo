@@ -4,8 +4,8 @@ from random import randint
 
 
 class Conversation:
+    entries = []
     def __init__(self):
-        self.entries = []
         # the information that PuppyChat needs to remember in order to properly answer the question
         self.topics = {
             'user': str(),
@@ -410,11 +410,8 @@ class Conversation:
 
         return ConversationalListing(self.response)
 
-    def Entries(self):
-        return self.entries
-
     def clear(self):
-        self.entries.clear()
+        self.entries = []
 
 
 class ChatEntry:
@@ -434,7 +431,6 @@ class ChatEntry:
 
 class Demo:
     conversation = Conversation()
-    entries = []
     goodbye = False
 
     # get goodbye before calling Ask() so that the goodbye entry can be printed on the screen
@@ -449,7 +445,7 @@ class Demo:
 
         new_entry = ChatEntry(question, output)
 
-        self.entries.append(new_entry)
+        self.conversation.entries.append(new_entry)
 
 
 # HELPER FUNCTIONS
@@ -1083,3 +1079,4 @@ def ConversationalListing(string):
 
     else:
         return string
+
