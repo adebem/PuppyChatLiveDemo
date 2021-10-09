@@ -1,13 +1,28 @@
 from django.shortcuts import render
 from .forms import QuestionForm
-from .demo import Demo
+from .demo import Conversation, ChatEntry
 from pathlib import Path
 
+
 # Create your views here.
-demo = Demo()
+conversation = Conversation()
+entries = []
+
+# get goodbye before calling Ask() so that the goodbye entry can be printed on the screen
+def Ask(question):
+    global entries, conversation
+
+    if question.lower().replace(".|?|!", "") in {"goodbye", "bye", "farewell"}:
+        output = "Goodbye!"
+    else:
+        output = conversation.respond(question)
+
+    new_entry = ChatEntry(question, output)
+    entries.append(new_entry)
+
 
 def Home(request):
-    global demo
+    global entries
 
     form = QuestionForm
     welcome = '\nWelcome to PuppyChat! This is a project meant to showcase my skills in the python programming\n' \
@@ -20,23 +35,19 @@ def Home(request):
     if 'input' in dict(request.POST).keys():
         question = dict(request.POST)['input'][0]
 
-        if (len(list(demo.conversation.entries)) == 0) or (str(question) != str(list(demo.conversation.entries)[-1])):
-            demo.Ask(question)
+        if (len(list(entries)) == 0) or (str(question) != str(list(entries)[-1])):
+            Ask(question)
 
-        if (len(list(demo.conversation.entries)) > 1) and (demo.conversation.entries[-2].answer().startswith('Goodbye')):
-            demo.conversation.entries = [demo.conversation.entries[-1]]
+        if (len(list(entries)) > 1) and (entries[-2].answer().startswith('Goodbye')):
+            entries = [entries[-1]]
     else:
-        demo.conversation.entries = []
-
-    goodbye = demo.goodbye
+        entries = []
 
     context = {
         "welcome": welcome,
         "form": form,
-        "entries": demo.conversation.entries,
-        "demo": demo,
-        "conversation": demo.conversation,
-        'goodbye': goodbye,
+        "entries": entries,
+        "conversation": conversation,
         'rp': dict(request.POST),
         'based': Path(__file__).resolve().parent.parent,
     }
