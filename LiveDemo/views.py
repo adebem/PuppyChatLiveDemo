@@ -24,6 +24,8 @@ def Ask(question):
 def Home(request):
     global entries
 
+    entries_before = entries
+
     form = QuestionForm
     welcome = '\nWelcome to PuppyChat! This is a project meant to showcase my skills in the python programming\n' \
               'language. PuppyChat intelligently answers trivia questions about the American Kennel Club\'s top 60\n' \
@@ -47,6 +49,7 @@ def Home(request):
         "welcome": welcome,
         "form": form,
         "entries": entries,
+        "entries_before": entries_before,
         "conversation": conversation,
         'rp': dict(request.POST),
         'based': Path(__file__).resolve().parent.parent,
