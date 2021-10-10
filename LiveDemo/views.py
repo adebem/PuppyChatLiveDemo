@@ -1,30 +1,30 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from .forms import QuestionForm
 from .demo import Conversation, ChatEntry
 from pathlib import Path
 
 
 # Create your views here.
-conversation = Conversation()
-entries = []
 
 # get goodbye before calling Ask() so that the goodbye entry can be printed on the screen
-def Ask(question):
-    global entries, conversation
-
+def Ask(question, conversation):
+    i=3
     if question.lower().replace(".|?|!", "") in {"goodbye", "bye", "farewell"}:
         output = "Goodbye!"
     else:
         output = conversation.respond(question)
 
     new_entry = ChatEntry(question, output)
-    entries.append(new_entry)
+    conversation.entries.append(new_entry)
 
 
-def Home(request):
-    global entries
+def index(request):
+    return redirect('home')
 
-    entries_before = entries
+
+def home(request, conversation=Conversation()):
+
+    entries_before = conversation.entries
 
     form = QuestionForm
     welcome = '\nWelcome to PuppyChat! This is a project meant to showcase my skills in the python programming\n' \
@@ -37,18 +37,18 @@ def Home(request):
     if 'input' in dict(request.POST).keys():
         question = dict(request.POST)['input'][0]
 
-        if (len(list(entries)) == 0) or (str(question) != str(list(entries)[-1])):
-            Ask(question)
+        if (len(list(conversation.entries)) == 0) or (str(question) != str(list(conversation.entries)[-1])):
+            Ask(question, conversation)
 
-        if (len(list(entries)) > 1) and (entries[-2].answer().startswith('Goodbye')):
-            entries = [entries[-1]]
+        if (len(list(conversation.entries)) > 1) and (conversation.entries[-2].answer().startswith('Goodbye')):
+            conversation.entries = [conversation.entries[-1]]
     else:
-        entries = []
+        conversation.entries = []
 
     context = {
         "welcome": welcome,
         "form": form,
-        "entries": entries,
+        "entries": conversation.entries,
         "entries_before": entries_before,
         "conversation": conversation,
         'rp': dict(request.POST),
