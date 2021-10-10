@@ -22,7 +22,7 @@ def index(request):
     return redirect('home')
 
 
-def home(request, conversation=Conversation()):
+def home(request, conversation):
 
     entries_before = conversation.entries
 
