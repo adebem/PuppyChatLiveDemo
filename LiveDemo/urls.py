@@ -9,5 +9,5 @@ convo = Conversation()
 
 urlpatterns = [
     path('', index, name='Index'),
-    path(f'Conversation:conversation', home, name='home')
+    path(f'Conversation:conversation', home, {'conversation': convo}, name='home')
 ]
