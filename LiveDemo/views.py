@@ -99,9 +99,7 @@ def home(request):
         "conversation": conversation,
         "welcome": welcome,
         "form": form,
-        "entries": entries,
-        'rp': dict(request.POST),
-        'based': Path(__file__).resolve().parent.parent,
+        "entries": entries
     }
 
     updateConversation(request, conversation)
