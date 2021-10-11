@@ -4,26 +4,16 @@ from random import randint
 
 
 class Conversation:
-    entries = []
-    def __init__(self):
+
+    def __init__(self, convo_dict):
         # the information that PuppyChat needs to remember in order to properly answer the question
-        self.topics = {
-            'user': str(),
-            'previous_dog1': None,
-            'previous_dog2': None,
-            'dog1': None,
-            'dog2': None,
-            'subject': None,
-            'description_detail': 0,
-            'compare': False,
-            'comparison_keyword': None,
-            'what/which': False
-        }
-        self.disclaimer = "According to the American Kennel Club:\n"
-        self.first_question = True
-        self.response = ''
+        self.topics = convo_dict['topics']
+        self.disclaimer = convo_dict['disclaimer']
+        self.first_question = convo_dict['first_question']
+        self.response = convo_dict['response']
+        self.sentence = convo_dict['sentence']
         self.parse_tree = dict()
-        self.sentence = None
+
 
     # true if the user input is a 'bye', 'goodbye', or 'farewell', false otherwise
     def Goodbye(self, userInput):
@@ -410,14 +400,8 @@ class Conversation:
 
         return ConversationalListing(self.response)
 
-    def clear(self):
-        self.entries = []
-
 
 class ChatEntry:
-    i = ''
-    o = ''
-
     def __init__(self, question, answr):
         self.i = question
         self.o = answr
