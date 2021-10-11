@@ -13,21 +13,6 @@
     </head>
 
     <body>
-        <table>
-            <tr>
-                <th>conversation</th>
-                <th>{{conversation}}</th>
-            </tr>
-            <tr>
-                <th>entries_before</th>
-                <th>{{entries_before}}</th>
-            </tr>
-            <tr>
-                <th>entries</th>
-                <th>{{entries}}</th>
-            </tr>
-        </table>
-
         <div class = "bar">
             <a href = "http://www.anthonydevelops.com/index.html">
                 <div class = "tab">
@@ -80,7 +65,6 @@
             </div>
 
             {% for entry in entries %}
-
 
             <div class = "entry">
                 <h6>{{ entry}}</h6>
