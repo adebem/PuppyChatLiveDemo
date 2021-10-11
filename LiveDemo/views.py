@@ -1,14 +1,11 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 from .forms import QuestionForm
 from .demo import Conversation, ChatEntry
 from pathlib import Path
 
 
-# Create your views here.
-
-# get goodbye before calling Ask() so that the goodbye entry can be printed on the screen
+# Asks a question and saves it as well as its answer to request.session
 def Ask(request, question, conversation):
-    i=3
     if question.lower().replace(".|?|!", "") in {"goodbye", "bye", "farewell"}:
         output = "Goodbye!"
     else:
@@ -17,6 +14,8 @@ def Ask(request, question, conversation):
     request.session['chat_inputs'] = request.session['chat_inputs'] + [question]
     request.session['chat_outputs'] = request.session['chat_outputs'] + [output]
 
+
+# sets up the data structures necessary for a new conversation and saves them to request.session
 def startTalking(request):
     new_convo = {
         'topics': {
@@ -37,9 +36,9 @@ def startTalking(request):
         'sentence': None
     }
     request.session['conversation'] = new_convo
-    request.session['chat_inputs'] = []
-    request.session['chat_outputs'] = []
 
+
+# saves the updated conversation information to request.session
 def updateConversation(request, conversation):
     request.session['conversation']['topics'] = conversation.topics
     request.session['conversation']['disclaimer'] = conversation.disclaimer
@@ -47,6 +46,8 @@ def updateConversation(request, conversation):
     request.session['conversation']['response'] = conversation.response
     request.session['conversation']['sentence'] = conversation.sentence
 
+
+# constructs a list of entry objects to display when home.html is rendered
 def createEntries(request):
     entries = []
 
@@ -57,13 +58,23 @@ def createEntries(request):
 
     return entries
 
-def home(request):
-    i=3
-    if request.method == 'GET' or 'conversation' not in dict(request.session).keys():
+def newChatCheck(request):
+    get = (request.method == 'GET')
+    no_conversation = ('conversation' not in dict(request.session).keys())
+    no_inputs = ('chat_inputs' not in dict(request.session).keys())
+    no_outputs = ('chat_outputs' not in dict(request.session).keys())
+
+    if get or no_conversation or no_inputs or no_outputs:
         startTalking(request)
+        request.session['chat_inputs'] = []
+        request.session['chat_outputs'] = []
+
+
+# Updates and displays the conversation with PuppyChat
+def home(request):
+    newChatCheck(request)
 
     conversation = Conversation(request.session['conversation'])
-
     form = QuestionForm
     welcome = '\nWelcome to PuppyChat! This is a project meant to showcase my skills in the python programming\n' \
               'language. PuppyChat intelligently answers trivia questions about the American Kennel Club\'s top 60\n' \
@@ -75,17 +86,15 @@ def home(request):
     if 'input' in dict(request.POST).keys():
         question = dict(request.POST)['input'][0]
 
-        if (len(request.session['entries']) == 0) or (str(question) != str(request.session['entries'][-1])):
+        if (len(request.session['chat_inputs']) == 0) or (str(question) != str(request.session['chat_inputs'][-1])):
             Ask(request, question, conversation)
 
-        if (len(request.session['entries']) > 1) and (request.session['entries'][-2].answer().startswith('Goodbye')):
-            request.session['entries'] = request.session['entries'][-1:]
-    else:
-        request.session['entries'] = []
-
+        if (len(request.session['chat_inputs']) > 1) and (request.session['chat_outputs'][-2].startswith('Goodbye')):
+            startTalking(request)
+            request.session['chat_inputs'] = request.session['chat_inputs'][-1:]
+            request.session['chat_outputs'] = request.session['chat_outputs'][-1:]
 
     entries = createEntries(request)
-
     context = {
         "conversation": conversation,
         "welcome": welcome,
