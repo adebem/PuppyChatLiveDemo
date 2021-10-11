@@ -3,6 +3,7 @@ from .models import Dog
 from random import randint
 
 
+# Class that stores context from previous questions and answers new questions
 class Conversation:
 
     def __init__(self, convo_dict):
@@ -14,14 +15,13 @@ class Conversation:
         self.sentence = convo_dict['sentence']
         self.parse_tree = dict()
 
-
     # true if the user input is a 'bye', 'goodbye', or 'farewell', false otherwise
-    def Goodbye(self, userInput):
-        if len(userInput) > 0:
-            if not userInput[-1].isalpha():
-                userInput = userInput[:-1]
+    def Goodbye(self, user_input):
+        if len(user_input) > 0:
+            if not user_input[-1].isalpha():
+                user_input = user_input[:-1]
 
-            first_word = userInput.lower().split(' ')[0]
+            first_word = user_input.lower().split(' ')[0]
             if first_word in {'bye', 'goodbye', 'farewell'}:
                 if self.topics['user']:
                     return f'Goodbye {self.topics["user"]}!'
@@ -45,29 +45,6 @@ class Conversation:
                     biggest_sentence, max_len = possible_tree, possible_tree.length()
 
             return biggest_sentence
-
-    @staticmethod
-    # returns a dog name if the given name is a valid dog name
-    # returns nothing otherwise
-    def getDogName(name):
-        # first, we find the first letter of the given name and get that index
-        first_letter = name[0]
-
-        # if first_letter in list(dogInfo.keys()):
-        name_index = Dog.objects.filter(name__startswith=first_letter)
-        # then, we search all dog names and nicknames in that index for the name of the dog
-        for dog in name_index:
-            is_name = (name == dog.getName())
-            is_nickname = (dog.getNicknames() and (name in dog.getNicknames()))
-            if is_name or is_nickname:
-                return dog.getName()
-
-        # if the name wasn't in that list, check the nicknames of every dog not that list
-        other_dogs = Dog.objects.exclude(name__startswith=first_letter)
-        for dog in other_dogs:
-            # skip the index that we already searched through and only check the nicknames
-            if dog.getNicknames() and (name in dog.getNicknames()):
-                return dog.getName()
 
     # saves the dog name in whatever place is available
     def addDog(self, name):
@@ -114,7 +91,6 @@ class Conversation:
         leaves = sentence_tree.leaves()
         name_given = False
 
-        # analyses each word in the tree
         for wordType, word in leaves:
 
             is_question_word = (word in {'temperament', 'height', 'weight', 'lifespan', 'group', 'description'})
@@ -150,9 +126,8 @@ class Conversation:
             elif (wordType == 'Pronoun') and (word in {'they', 'those', 'them'}):
                 self.addDog(self.topics['previous_dog1'])
 
-            # if the user entered a name
             elif wordType == 'Name':
-                name = self.getDogName(word.title())
+                name = getDogName(word.title())
                 if name:  # if it's a valid dog name, save that dog's name
                     self.addDog(name)
                 elif self.response == '':
@@ -160,15 +135,13 @@ class Conversation:
                     name_given = True
                     self.topics['user'] = word.title()
 
-            # if the user entered a preposition
             elif wordType == 'Preposition':
                 if word == 'like':
                     self.topics['subject'] = 'temperament'
                 if word == 'than':
                     self.topics['compare'] = True
 
-            # if the user entered an adjective, verb, or a noun
-            # find if there is a keyword to be saved
+            # if the user entered an adjective, verb, or a noun: find if there is a keyword to be saved
             if wordType in {'Adjective', 'Verb', 'Noun'}:
                 self.findKeyword(word)
 
@@ -202,6 +175,7 @@ class Conversation:
             except ValueError:
                 return False
 
+    # Generates output for a one-to-all comparison
     def findTopics(self):
         # finds the subject dog for the comparison (if there is one)
         if self.topics['dog1'] and (self.topics['dog1'] != 'ALL'):
@@ -236,7 +210,7 @@ class Conversation:
         else:
             return ''
 
-    # calls a helper function to get a response depending on the subject
+    # Generates output for question about one particular dog breed
     def singularResponse(self, dog_name, proper_name):
 
         output = ''
@@ -253,6 +227,7 @@ class Conversation:
 
         return output
 
+    # Decides the type of question and generates its output
     def pickResponse(self, question_number):
         if self.topics['subject']:
             # if there are two subject dogs and the subject is group, then we compare
@@ -341,19 +316,13 @@ class Conversation:
         self.parse_tree = dict()
         self.sentence = None
 
+    # After ever response, topics should be reset, but remember dogs mentioned in the previous question
     def resetTopics(self):
         if self.topics['dog1']:
             self.topics['previous_dog1'] = self.topics['dog1']
         if self.topics['dog2']:
             self.topics['previous_dog2'] = self.topics['dog2']
         self.clearTopics()
-
-    def reset(self):
-        self.topics['previous_dog1'] = None
-        self.topics['previous_dog2'] = None
-        self.first_question = True
-        self.clearTopics()
-        self.response = ''
 
     # for each question:
     #     parses the user's question
@@ -401,6 +370,7 @@ class Conversation:
         return ConversationalListing(self.response)
 
 
+# stores a chat entry's input and output
 class ChatEntry:
     def __init__(self, question, answr):
         self.i = question
@@ -412,8 +382,32 @@ class ChatEntry:
     def answer(self):
         return self.o
 
+
 # HELPER FUNCTIONS
 
+# returns a dog name if the given name is a valid dog name
+# returns nothing otherwise
+def getDogName(name):
+    # first, we find the first letter of the given name and get that index
+    first_letter = name[0]
+
+    name_index = Dog.objects.filter(name__startswith=first_letter)
+    # then, we search all dog names and nicknames in that index for the name of the dog
+    for dog in name_index:
+        is_name = (name == dog.getName())
+        is_nickname = (dog.getNicknames() and (name in dog.getNicknames()))
+        if is_name or is_nickname:
+            return dog.getName()
+
+    # if the name wasn't in that list, check the nicknames of every dog not that list
+    other_dogs = Dog.objects.exclude(name__startswith=first_letter)
+    for dog in other_dogs:
+        # skip the index that we already searched through and only check the nicknames
+        if dog.getNicknames() and (name in dog.getNicknames()):
+            return dog.getName()
+
+
+# displays a pluralized version of a breed name if needed
 def makePlural(name):
     if name.lower() == 'cane corso':
         return name[:3] + 'i' + name[4:9] + 'i'
@@ -452,9 +446,9 @@ def getDescription(dog_name, detail):
     return response
 
 
-# return the information from the given dog's dog dictionary entry
-def getDog(dogName):
-    subj_dog = Dog.objects.get(name=dogName)
+# retrieves breed information from the Dog database given a breed name
+def getDog(dog_name):
+    subj_dog = Dog.objects.get(name=dog_name)
     return subj_dog
 
 
@@ -498,7 +492,7 @@ def answer(subj, attr):
     return response
 
 
-# constructs a response regarding a question about a singular dog
+# answers a question about one particular breed's height, weight, lifespan, or group
 def singularQuestion(dog_name, proper_name, subj):
     subject = getDog(dog_name).getSubject(subj)
     response, qualifier = '', ''
@@ -614,11 +608,11 @@ def getMinOrMax(name, attribute, f):
 #    min_difference: difference between the minimum values of the each dog's attribute
 #    always_taller: whether or not the first dog is always taller than the second dog
 #    always_shorter: whether or not the first dog is always shorter than the second dog
-def getDifferences(dogName1, dogName2, subject) -> object:
-    max1 = getMinOrMax(dogName1, subject, max)
-    min1 = getMinOrMax(dogName1, subject, min)
-    max2 = getMinOrMax(dogName2, subject, max)
-    min2 = getMinOrMax(dogName2, subject, min)
+def getDifferences(dog_name1, dog_name2, subject) -> object:
+    max1 = getMinOrMax(dog_name1, subject, max)
+    min1 = getMinOrMax(dog_name1, subject, min)
+    max2 = getMinOrMax(dog_name2, subject, max)
+    min2 = getMinOrMax(dog_name2, subject, min)
 
     if str in {type(max1), type(min1), type(max2), type(min2)}:
         # conveniently returns the name of the dogs that have the completely ambiguous attributes
@@ -824,7 +818,7 @@ def compare(dog_name1, proper_name1, dog_name2, proper_name2, attribute, compari
         return response + '\n'
 
 
-# produces a response that lists all dogs in a given group
+# lists all dogs in a given group
 def dogsInGroup(group_name):
     response = 'These are some of the most popular breeds in the {} group:\n'.format(group_name)
     for dog in Dog.objects.all():
@@ -1043,4 +1037,3 @@ def ConversationalListing(string):
 
     else:
         return string
-
