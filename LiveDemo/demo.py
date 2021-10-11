@@ -306,6 +306,7 @@ class Conversation:
         return self.response
 
     def clearTopics(self):
+        self.topics['user'] = None
         self.topics['dog1'] = None
         self.topics['dog2'] = None
         self.topics['subject'] = None
