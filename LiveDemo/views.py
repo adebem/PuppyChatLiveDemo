@@ -93,6 +93,7 @@ def home(request):
             startTalking(request)
             request.session['chat_inputs'] = request.session['chat_inputs'][-1:]
             request.session['chat_outputs'] = request.session['chat_outputs'][-1:]
+            conversation.topics['user'] = []
 
     entries = createEntries(request)
     context = {
