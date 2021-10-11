@@ -7,24 +7,62 @@ from pathlib import Path
 # Create your views here.
 
 # get goodbye before calling Ask() so that the goodbye entry can be printed on the screen
-def Ask(question, conversation):
+def Ask(request, question, conversation):
     i=3
     if question.lower().replace(".|?|!", "") in {"goodbye", "bye", "farewell"}:
         output = "Goodbye!"
     else:
         output = conversation.respond(question)
 
-    new_entry = ChatEntry(question, output)
-    conversation.entries.append(new_entry)
+    request.session['chat_inputs'] = request.session['chat_inputs'] + [question]
+    request.session['chat_outputs'] = request.session['chat_outputs'] + [output]
 
+def startTalking(request):
+    new_convo = {
+        'topics': {
+            'user': str(),
+            'previous_dog1': None,
+            'previous_dog2': None,
+            'dog1': None,
+            'dog2': None,
+            'subject': None,
+            'description_detail': 0,
+            'compare': False,
+            'comparison_keyword': None,
+            'what/which': False
+        },
+        'disclaimer': "According to the American Kennel Club:\n",
+        'first_question': True,
+        'response': '',
+        'sentence': None
+    }
+    request.session['conversation'] = new_convo
+    request.session['chat_inputs'] = []
+    request.session['chat_outputs'] = []
 
-def index(request):
-    return redirect('home')
+def updateConversation(request, conversation):
+    request.session['conversation']['topics'] = conversation.topics
+    request.session['conversation']['disclaimer'] = conversation.disclaimer
+    request.session['conversation']['first_question'] = conversation.first_question
+    request.session['conversation']['response'] = conversation.response
+    request.session['conversation']['sentence'] = conversation.sentence
 
+def createEntries(request):
+    entries = []
 
-def home(request, conversation):
+    for i in range(len(request.session['chat_inputs'])):
+        chat_input, chat_output = request.session['chat_inputs'][i], request.session['chat_outputs'][i]
+        entry = ChatEntry(chat_input, chat_output)
+        entries.append(entry)
 
-    entries_before = conversation.entries
+    return entries
+
+def home(request):
+    i=3
+    if request.method == 'GET' or 'conversation' not in dict(request.session).keys():
+        startTalking(request)
+
+    conversation = Conversation(request.session['conversation'])
 
     form = QuestionForm
     welcome = '\nWelcome to PuppyChat! This is a project meant to showcase my skills in the python programming\n' \
@@ -37,22 +75,27 @@ def home(request, conversation):
     if 'input' in dict(request.POST).keys():
         question = dict(request.POST)['input'][0]
 
-        if (len(list(conversation.entries)) == 0) or (str(question) != str(list(conversation.entries)[-1])):
-            Ask(question, conversation)
+        if (len(request.session['entries']) == 0) or (str(question) != str(request.session['entries'][-1])):
+            Ask(request, question, conversation)
 
-        if (len(list(conversation.entries)) > 1) and (conversation.entries[-2].answer().startswith('Goodbye')):
-            conversation.entries = [conversation.entries[-1]]
+        if (len(request.session['entries']) > 1) and (request.session['entries'][-2].answer().startswith('Goodbye')):
+            request.session['entries'] = request.session['entries'][-1:]
     else:
-        conversation.entries = []
+        request.session['entries'] = []
+
+
+    entries = createEntries(request)
 
     context = {
+        "conversation": conversation,
         "welcome": welcome,
         "form": form,
-        "entries": conversation.entries,
-        "entries_before": entries_before,
-        "conversation": conversation,
+        "entries": entries,
         'rp': dict(request.POST),
         'based': Path(__file__).resolve().parent.parent,
     }
+
+    updateConversation(request, conversation)
+    request.session.modified = True
 
     return render(request, "home.html", context)
