@@ -32,13 +32,19 @@ def GetValue(attribute):
 
 def ToList(string):
     if string[0] == "[":
-        return string[1:-1].split(", ")
+        if len(string[1:-1].split(", ")) > 1:
+            return string[1:-1].split(", ", 1)
+        else:
+            return string[1:-1].split(",", 1)
     else:
         return False
 
 def ToTuple(string):
     if string[0] == "(":
-        terms = string[1:-1].split(", ")
+        if len(string[1:-1].split(", ")) > 1:
+            terms = string[1:-1].split(", ", 1)
+        else:
+            terms = string[1:-1].split(",", 1)
         return terms[0], terms[1]
     else:
         return False
